@@ -6,14 +6,17 @@ require __DIR__ . '/config/config.php';
 require __DIR__ . '/vendor/autoload.php';
 
 use App\ContentManager;
+use App\AffiliateLinker;
 use App\I18n;
 use App\SeoHelper;
 
 $cfg = require CONFIG_PATH . '/languages.php';
 $languages = $cfg['languages'];
+$affiliates = $cfg['affiliates'];
 
 // Objetos compartilhados pelas rotas desta requisicao.
 $i18n = new I18n($languages, SITE_DEFAULT_LANG);
+$affiliate = new AffiliateLinker($affiliates);
 $requestUri = trim(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/', '/');
 
 // Variaveis padrao lidas pelo header; cada rota especializa o que precisar.
@@ -45,6 +48,11 @@ if ($requestUri === 'robots.txt') {
     echo "Allow: /\n\n";
     echo 'Sitemap: ' . SITE_URL . "/sitemap.xml\n";
     exit;
+}
+
+// Redirect de afiliado: registra clique e responde 302 para o parceiro.
+if (preg_match('#^go/([a-z0-9-]+)/?$#', $requestUri, $matches)) {
+    $affiliate->redirect($matches[1], $_GET['ref'] ?? null);
 }
 
 // A raiz canonica redireciona para o idioma detectado ou o default.

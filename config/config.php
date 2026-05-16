@@ -25,6 +25,7 @@ define('AUTHOR_URL', 'https://pauloribeiro.dev');
 
 define('NEWSLETTER_PROVIDER', 'mailerlite');
 define('NEWSLETTER_FORM_ID', 'XXXXX');
+define('NEWSLETTER_FORM_ACTION', '');
 
 define('IS_PRODUCTION', getenv('APP_ENV') === 'production');
 define('DEBUG_MODE', !IS_PRODUCTION);

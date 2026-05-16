@@ -25,6 +25,10 @@
         <?php endif; ?>
     </header>
 
+    <?php require TEMPLATES_PATH . '/partials/affiliate-disclosure.php'; ?>
+
+    <?php require TEMPLATES_PATH . '/partials/comparison-table.php'; ?>
+
     <?php if (!empty($post['meta']['image'])): ?>
         <!-- Imagem principal declarada no frontmatter; as internas ficam no corpo Markdown. -->
         <figure class="post-cover">
@@ -51,6 +55,10 @@
         </footer>
     <?php endif; ?>
 </article>
+
+<?php require TEMPLATES_PATH . '/partials/author-bio.php'; ?>
+
+<?php require TEMPLATES_PATH . '/partials/newsletter-cta.php'; ?>
 
 <?php if (!empty($related)): ?>
     <!-- Relacionados sao limitados a posts da mesma categoria. -->

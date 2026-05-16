@@ -45,7 +45,7 @@ return [
             ],
         ],
     ],
-    // Programas configurados para a fase futura de links afiliados.
+    // Programas configurados para redirects internos em /go/{program}/.
     'affiliates' => [
         'hostinger' => [
             'url' => 'https://hostinger.com.br/afiliado/?ref=PAULORIBEIRO',
