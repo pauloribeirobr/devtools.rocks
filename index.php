@@ -16,6 +16,15 @@ $languages = $cfg['languages'];
 $i18n = new I18n($languages, SITE_DEFAULT_LANG);
 $requestUri = trim(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/', '/');
 
+// Variaveis padrao lidas pelo header; cada rota especializa o que precisar.
+$hreflang_tags = '';
+$schema_page = '';
+$schema_article = '';
+$schema_faq = '';
+$schema_breadcrumb = '';
+$breadcrumbItems = [];
+$og_type = 'website';
+
 // Sitemap e global porque agrega posts de todos os idiomas.
 if ($requestUri === 'sitemap.xml') {
     header('Content-Type: application/xml; charset=UTF-8');
@@ -67,6 +76,10 @@ if ($rest === '') {
     $meta_description = $i18n->t('site.meta_description');
     $canonical = SITE_URL . "/{$lang}/";
     $og_image = OG_IMAGE;
+    $hreflang_tags = $seo->localizedHomeHreflangTags();
+    $schema_page = $seo->webSiteSchema()
+        . "\n"
+        . $seo->webPageSchema($canonical, $page_title, $meta_description, 'WebPage');
 
     require TEMPLATES_PATH . '/header.php';
     require TEMPLATES_PATH . '/home.php';
@@ -84,6 +97,13 @@ if (preg_match("#^{$categoryRoute}/([a-z0-9-]+)/?$#", $rest, $matches)) {
     $meta_description = $i18n->t('category.meta_description', ['category' => $categoryName]);
     $canonical = SITE_URL . "/{$lang}/{$categoryRoute}/{$categorySlug}/";
     $og_image = OG_IMAGE;
+    $hreflang_tags = $seo->localizedTaxonomyHreflangTags('category', $categorySlug);
+    $breadcrumbItems = [
+        ['label' => $i18n->t('nav.home'), 'url' => SITE_URL . "/{$lang}/"],
+        ['label' => $categoryName],
+    ];
+    $schema_breadcrumb = $seo->breadcrumbSchema($breadcrumbItems);
+    $schema_page = $seo->collectionPageSchema($canonical, $page_title, $meta_description, $posts);
 
     require TEMPLATES_PATH . '/header.php';
     require TEMPLATES_PATH . '/category.php';
@@ -100,6 +120,13 @@ if (preg_match("#^{$tagRoute}/([a-z0-9-]+)/?$#", $rest, $matches)) {
     $canonical = SITE_URL . "/{$lang}/{$tagRoute}/{$tagName}/";
     $og_image = OG_IMAGE;
     $meta_robots = 'noindex, follow';
+    $hreflang_tags = $seo->localizedTaxonomyHreflangTags('tag', $tagName);
+    $breadcrumbItems = [
+        ['label' => $i18n->t('nav.home'), 'url' => SITE_URL . "/{$lang}/"],
+        ['label' => $tagName],
+    ];
+    $schema_breadcrumb = $seo->breadcrumbSchema($breadcrumbItems);
+    $schema_page = $seo->collectionPageSchema($canonical, $page_title, $meta_description, $posts);
 
     require TEMPLATES_PATH . '/header.php';
     require TEMPLATES_PATH . '/tag.php';
@@ -114,6 +141,18 @@ foreach (['about', 'contact', 'privacy'] as $staticPage) {
         $meta_description = $i18n->t("page.{$staticPage}.meta_description");
         $canonical = SITE_URL . "/{$lang}/{$rest}/";
         $og_image = OG_IMAGE;
+        $hreflang_tags = $seo->localizedStaticHreflangTags($staticPage);
+        $breadcrumbItems = [
+            ['label' => $i18n->t('nav.home'), 'url' => SITE_URL . "/{$lang}/"],
+            ['label' => $i18n->t("page.{$staticPage}.title")],
+        ];
+        $schema_breadcrumb = $seo->breadcrumbSchema($breadcrumbItems);
+        $pageSchemaType = match ($staticPage) {
+            'about' => 'AboutPage',
+            'contact' => 'ContactPage',
+            'privacy' => 'PrivacyPolicy',
+        };
+        $schema_page = $seo->webPageSchema($canonical, $page_title, $meta_description, $pageSchemaType);
 
         require TEMPLATES_PATH . '/header.php';
         require TEMPLATES_PATH . "/{$staticPage}.php";
@@ -133,16 +172,29 @@ if (preg_match('#^([a-z0-9-]+)/?$#', $rest, $matches)) {
     }
 
     $page_title = $post['meta']['title'] . ' - ' . SITE_NAME;
-    $meta_description = $post['meta']['description'] ?? '';
+    $meta_description = $post['meta']['description']
+        ?? trim(substr(preg_replace('/\s+/', ' ', strip_tags($post['html'])) ?? '', 0, 155));
     $canonical = SITE_URL . "/{$lang}/{$slug}/";
     $og_image = !empty($post['meta']['image'])
         ? SITE_URL . "/content/{$lang}/{$slug}/{$post['meta']['image']}"
         : OG_IMAGE;
-    $hreflang_tags = $seo->hreflangTags($post['meta'], "/{$lang}/{$slug}/");
-    $schema_breadcrumb = $seo->breadcrumbSchema([
+    $og_type = 'article';
+    $hreflang_tags = $seo->postHreflangTags($post['meta']);
+    $breadcrumbItems = [
         ['label' => $i18n->t('nav.home'), 'url' => SITE_URL . "/{$lang}/"],
-        ['label' => $post['meta']['title']],
-    ]);
+    ];
+    if (!empty($post['meta']['category'])) {
+        $categories = $manager->getCategories();
+        $categoryName = $post['meta']['category_name'] ?? $categories[$post['meta']['category']] ?? $post['meta']['category'];
+        $breadcrumbItems[] = [
+            'label' => $categoryName,
+            'url' => SITE_URL . "/{$lang}/{$categoryRoute}/{$post['meta']['category']}/",
+        ];
+    }
+    $breadcrumbItems[] = ['label' => $post['meta']['title']];
+    $schema_breadcrumb = $seo->breadcrumbSchema($breadcrumbItems);
+    $schema_article = $seo->schemaByType($post, $canonical);
+    $schema_faq = $seo->faqSchema($post);
     $related = $manager->getRelatedPosts($slug, $post['meta']['category'] ?? '');
 
     require TEMPLATES_PATH . '/header.php';
@@ -163,6 +215,7 @@ function renderNotFound(I18n $i18n, string $lang): never
     $canonical = SITE_URL . "/{$lang}/";
     $og_image = OG_IMAGE;
     $meta_robots = 'noindex, follow';
+    $og_type = 'website';
 
     require TEMPLATES_PATH . '/header.php';
     require TEMPLATES_PATH . '/404.php';

@@ -26,6 +26,8 @@ return [
     'post.published_on' => 'Published on',
     'post.updated_on' => 'Updated on',
     'post.by_author' => 'By',
+    'post.in_category' => 'In',
     'post.related' => 'Related posts',
+    'post.tags' => 'Tags',
     'author.bio' => 'Senior Java Tech Lead with 12+ years in enterprise systems in the Brazilian financial sector.',
 ];

@@ -79,6 +79,27 @@ a:hover {
     padding: 40px 20px 64px;
 }
 
+.breadcrumbs {
+    margin-bottom: 24px;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.breadcrumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.breadcrumbs li:not(:last-child)::after {
+    content: "/";
+    margin-left: 8px;
+    color: var(--border);
+}
+
 .page-hero,
 .page-heading,
 .post-header {
@@ -152,6 +173,23 @@ a:hover {
 
 .post-content {
     max-width: 760px;
+}
+
+.post-taxonomy,
+.post-tags {
+    margin-top: 16px;
+}
+
+.post-cover {
+    margin: 0 0 32px;
+}
+
+.post-cover img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border);
 }
 
 .post-content img {

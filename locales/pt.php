@@ -26,6 +26,8 @@ return [
     'post.published_on' => 'Publicado em',
     'post.updated_on' => 'Atualizado em',
     'post.by_author' => 'Por',
+    'post.in_category' => 'Em',
     'post.related' => 'Posts relacionados',
+    'post.tags' => 'Tags',
     'author.bio' => 'Tech Lead Java com 12+ anos em sistemas enterprise do setor financeiro brasileiro.',
 ];

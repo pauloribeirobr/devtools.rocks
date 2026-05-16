@@ -15,6 +15,7 @@
             <p class="post-meta"><?= e($postItem['date'] ?? '') ?></p>
             <h2><a href="<?= e($postItem['url']) ?>"><?= e($postItem['title'] ?? $postItem['slug']) ?></a></h2>
             <p><?= e($postItem['description'] ?? $postItem['excerpt'] ?? '') ?></p>
+            <a class="read-more" href="<?= e($postItem['url']) ?>"><?= e($i18n->t('cta.read_more')) ?></a>
         </article>
     <?php endforeach; ?>
 </section>

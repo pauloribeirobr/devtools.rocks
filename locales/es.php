@@ -26,6 +26,8 @@ return [
     'post.published_on' => 'Publicado el',
     'post.updated_on' => 'Actualizado el',
     'post.by_author' => 'Por',
+    'post.in_category' => 'En',
     'post.related' => 'Posts relacionados',
+    'post.tags' => 'Tags',
     'author.bio' => 'Tech Lead Java sénior con 12+ años en sistemas enterprise del sector financiero brasileño.',
 ];

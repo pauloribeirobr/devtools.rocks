@@ -194,6 +194,9 @@ class ContentManager
         foreach (['date', 'updated'] as $key) {
             if (($meta[$key] ?? null) instanceof DateTimeInterface) {
                 $meta[$key] = $meta[$key]->format('Y-m-d');
+            } elseif (isset($meta[$key]) && is_int($meta[$key])) {
+                // Symfony YAML pode converter datas ISO para timestamp UTC.
+                $meta[$key] = gmdate('Y-m-d', $meta[$key]);
             } elseif (isset($meta[$key])) {
                 $meta[$key] = (string) $meta[$key];
             }
