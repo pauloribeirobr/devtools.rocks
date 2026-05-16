@@ -1,0 +1,16 @@
+# Local AI/coding-agent context. Keep these out of the public site repo.
+AGENTS.md
+PLANO_SITES_PARALELOS.md
+.agents/
+.codex/
+
+# Runtime and local environment
+/vendor/
+/.cache/
+/.env
+/.env.*
+!.env.example
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
